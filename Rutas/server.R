@@ -1,5 +1,6 @@
 library(shiny)
 library(dplyr)
+library(ggplot2)
 # Define data to be plotted and parametric to use
 server <- function(input, output, session) {
     
