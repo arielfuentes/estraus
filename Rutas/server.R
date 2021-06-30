@@ -1,9 +1,9 @@
 library(shiny)
 library(dplyr)
-# Define server logic required to draw a histogram
+# Define data to be plotted and parametric to use
 server <- function(input, output, session) {
     
-    #Summarize Data and then Plot
+    #Data
     data <- reactive({
         req(input$flt)
         df <- inf5_sum %>%
