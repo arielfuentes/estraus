@@ -25,6 +25,6 @@ server <- function(input, output) {
     
     output$plotviolin <- renderPlot({
         g <- ggplot(data(), aes_string("SerSen", input$flt))
-        g + geom_violin()
+        g + geom_violin(draw_quantiles = c(0.25, 0.5, 0.75))
     })
 }
