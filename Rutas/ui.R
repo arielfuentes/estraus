@@ -3,10 +3,13 @@ library(shiny)
 ui <- basicPage(
     h1("Resultado Estraus"),
     selectInput(inputId = "flt",
-                label = "Escoge variable",
+                label = "Variable Recorrido",
                 list("TIEMPO", "DISTANCIA", "FLUJO_LIN", 
                      "TASA_USO", "SUBEN", "BAJAN")),
+    selectInput(inputId = "flt_grph",
+                label = "Variable Arco",
+                list("TIEMPO", "DISTANCIA", "FLUJO_TOT")),
     plotOutput("plotbar"),
-    plotOutput("plotviolin")
-    
+    plotOutput("plotviolin"),
+    plotOutput("plotarco")
 )

@@ -17,6 +17,11 @@ server <- function(input, output) {
             select(SerSen, input$flt)
     })
     
+    data_grph <- reactive({
+        req(input$flt_grph)
+        df <- inf5_grph
+    })
+    
     #Plot 
     output$plotbar <- renderPlot({
         g <- ggplot(data_sum(), aes_string("SerSen", input$flt))
@@ -26,5 +31,13 @@ server <- function(input, output) {
     output$plotviolin <- renderPlot({
         g <- ggplot(data(), aes_string("SerSen", input$flt))
         g + geom_violin(draw_quantiles = c(0.25, 0.5, 0.75))
+    })
+    
+    output$plotarco <- renderPlot({
+        ggraph(inf5_grph, layout = 'kk') + 
+            geom_edge_link(aes_string(width = input$flt_grph, 
+                                      colour = input$flt_grph)) +
+            scale_edge_color_gradient(low = "green", high = "red") +
+            geom_node_point(aes(size = input$SUBEN, colour = input$BAJAN))
     })
 }

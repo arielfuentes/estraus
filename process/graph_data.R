@@ -1,7 +1,8 @@
 #library
 library(tidygraph)
+library(dplyr)
 library(ggplot2)
-library(ggr)
+library(ggraph)
 
 #tbl for edges
 inf5_edg <- inf5 %>%
@@ -37,5 +38,3 @@ inf5_grph <- inf5_grph %>%
   activate(nodes) %>%
   left_join(inf5_nd)
 rm(inf5_edg, inf5_nd)
-########################################################################
-
