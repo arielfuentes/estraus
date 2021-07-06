@@ -9,10 +9,23 @@ inf5 <- read_delim("data/salida.txt", delim = ";") %>%
               "SUBEN_NB",  "BAJAN_NA",  "BAJAN_NB"), 
               as.numeric) %>%
   separate(col = Linea, into = c("ws", "ID", "Ruta", "Sentido")) %>%
-  mutate(SerSen = paste0(Ruta, str_to_upper(substr(Sentido, 1, 1))),
-         SUBEN = SUBEN_NA,
-         BAJAN = BAJAN_NB) %>%
-    select(-c("ws", "ID", "Ruta", "Sentido"))
+  mutate(SerSen = paste0(Ruta, str_to_upper(substr(Sentido, 1, 1)
+                                            )
+                         )
+         ) %>%
+  select(-c("ws", "ID", "Ruta", "Sentido")) %>%
+  group_by(NodoA, NodoB, SerSen) %>%
+  summarise(TIEMPO = mean(TIEMPO), 
+            DISTANCIA = mean(DISTANCIA), 
+            FLUJO_LIN = sum(FLUJO_LIN),
+            FLUJO_TOT = mean(FLUJO_TOT), 
+            TASA_USO = mean(TASA_USO),  
+            SUBEN_NA = sum(SUBEN_NA),
+            SUBEN_NB = sum(SUBEN_NB), 
+            BAJAN_NA = sum(BAJAN_NA), 
+            BAJAN_NB = sum(BAJAN_NA)) %>%
+  mutate(SUBEN = SUBEN_NA, BAJAN = BAJAN_NB) %>%
+  ungroup()
 
 #summary
 inf5_sum <- group_by(inf5, SerSen) %>%
