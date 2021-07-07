@@ -27,7 +27,7 @@ inf5_ndB <- inf5 %>%
   select(name = NodoB, SUBEN = SUBEN_NB, BAJAN = BAJAN_NB)
 inf5_nd <- bind_rows(inf5_ndA, inf5_ndB) %>%
   group_by(name) %>%
-  filter(row_number(SUBEN)  == 1 & row_number(BAJAN)  == 1) %>%
+  summarise(SUBEN = sum(SUBEN), BAJAN = sum(BAJAN)) %>%
   ungroup()
 rm(inf5_ndA, inf5_ndB)
 
