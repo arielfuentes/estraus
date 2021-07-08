@@ -2,57 +2,57 @@
 ##selecting data that we will reuse to 
 n_dtI <- inf5 %>%
   filter(SerSen %in% c("119I", "111I")) %>%
-  select(NodoA, NodoB, TIEMPO, DISTANCIA, SerSen,  
-         SUBEN_NA, BAJAN_NA, SUBEN_NB, BAJAN_NB) %>%
+  select(NodoA, NodoB, TIEMPO, DISTANCIA, SerSen, SUBEN_NA, 
+         BAJAN_NA, SUBEN_NB, BAJAN_NB, FREC) %>%
   arrange(NodoA, NodoB, SerSen) %>%
   ungroup()
 
 n_dtR <- inf5 %>%
   filter(SerSen %in% c("119R", "111R")) %>%
-  select(NodoA, NodoB, TIEMPO, DISTANCIA, SerSen,  
-         SUBEN_NA, BAJAN_NA, SUBEN_NB, BAJAN_NB) %>%
+  select(NodoA, NodoB, TIEMPO, DISTANCIA, SerSen, SUBEN_NA, 
+         BAJAN_NA, SUBEN_NB, BAJAN_NB, FREC) %>%
   arrange(NodoA, NodoB, SerSen) %>%
   ungroup()
 
 #Graphs to visualize the data to pickup ----
-##tibble for nodes ----
-###Orientation I ----
-ndtI_ndA <- n_dtI %>%
-  group_by(NodoA) %>%
-  summarise(SUBEN_NA = sum(SUBEN_NA),
-            BAJAN_NA = sum(BAJAN_NA)) %>%
-  select(name = NodoA, SUBEN = SUBEN_NA, BAJAN = BAJAN_NA)
-ndtI_ndB <- n_dtI %>%
-  group_by(NodoB) %>%
-  summarise(SUBEN_NB = sum(SUBEN_NB),
-            BAJAN_NB = sum(BAJAN_NB)) %>%
-  select(name = NodoB, SUBEN = SUBEN_NB, BAJAN = BAJAN_NB)
-####Consolidated ----
-ndtI_nd <- bind_rows(ndtI_ndA, ndtI_ndB) %>%
-  group_by(name) %>% 
-  summarise(SUBEN = sum(SUBEN), BAJAN = sum(BAJAN)) %>%
-  ungroup()
-rm(ndtI_ndA, ndtI_ndB)
-
-###Orientation R ----
-ndtR_ndA <- n_dtR %>%
-  group_by(NodoA) %>%
-  summarise(SUBEN_NA = sum(SUBEN_NA),
-            BAJAN_NA = sum(BAJAN_NA)) %>%
-  select(name = NodoA, SUBEN = SUBEN_NA, BAJAN = BAJAN_NA)
-
-ndtR_ndB <- n_dtR %>%
-  group_by(NodoB) %>%
-  summarise(SUBEN_NB = sum(SUBEN_NB),
-            BAJAN_NB = sum(BAJAN_NB)) %>%
-  select(name = NodoB, SUBEN = SUBEN_NB, BAJAN = BAJAN_NB)
-####Consolidated ----
-ndtR_nd <- bind_rows(ndtR_ndA, ndtR_ndB) %>%
-  group_by(name) %>%
-  summarise(SUBEN = sum(SUBEN),
-            BAJAN = sum(BAJAN)) %>%
-  ungroup()
-rm(ndtR_ndA, ndtR_ndB)
+# ##tibble for nodes ----
+# ###Orientation I ----
+# ndtI_ndA <- n_dtI %>%
+#   group_by(NodoA) %>%
+#   summarise(SUBEN_NA = sum(SUBEN_NA),
+#             BAJAN_NA = sum(BAJAN_NA)) %>%
+#   select(name = NodoA, SUBEN = SUBEN_NA, BAJAN = BAJAN_NA)
+# ndtI_ndB <- n_dtI %>%
+#   group_by(NodoB) %>%
+#   summarise(SUBEN_NB = sum(SUBEN_NB),
+#             BAJAN_NB = sum(BAJAN_NB)) %>%
+#   select(name = NodoB, SUBEN = SUBEN_NB, BAJAN = BAJAN_NB)
+# ####Consolidated ----
+# ndtI_nd <- bind_rows(ndtI_ndA, ndtI_ndB) %>%
+#   group_by(name) %>% 
+#   summarise(SUBEN = sum(SUBEN), BAJAN = sum(BAJAN)) %>%
+#   ungroup()
+# rm(ndtI_ndA, ndtI_ndB)
+# 
+# ###Orientation R ----
+# ndtR_ndA <- n_dtR %>%
+#   group_by(NodoA) %>%
+#   summarise(SUBEN_NA = sum(SUBEN_NA),
+#             BAJAN_NA = sum(BAJAN_NA)) %>%
+#   select(name = NodoA, SUBEN = SUBEN_NA, BAJAN = BAJAN_NA)
+# 
+# ndtR_ndB <- n_dtR %>%
+#   group_by(NodoB) %>%
+#   summarise(SUBEN_NB = sum(SUBEN_NB),
+#             BAJAN_NB = sum(BAJAN_NB)) %>%
+#   select(name = NodoB, SUBEN = SUBEN_NB, BAJAN = BAJAN_NB)
+# ####Consolidated ----
+# ndtR_nd <- bind_rows(ndtR_ndA, ndtR_ndB) %>%
+#   group_by(name) %>%
+#   summarise(SUBEN = sum(SUBEN),
+#             BAJAN = sum(BAJAN)) %>%
+#   ungroup()
+# rm(ndtR_ndA, ndtR_ndB)
 
 ##creating graphs ----
 ndtI_grph <- as_tbl_graph(n_dtI)
@@ -79,11 +79,34 @@ n_dt2R <- bind_rows(v_1R, v_2R) %>%
   mutate(SerSen ="E01R")
 ##Consolidated ----
 n_dt2 <- bind_rows(n_dt2I, n_dt2R)
-rm(v_1I, v_1R, v_2I, v_2R, n_dt2I, n_dt2R)  
+rm(v_1I, v_1R, v_2I, v_2R, n_dt2I, n_dt2R, n_dtI, n_dtR)  
 #Data to model ----
 ##open users strata ----
 us_stta <- read_delim("data/Users_strata.csv", delim = ";")
 ##Declassify data by users strata ----
+###Current data ----
 inf5_users <- inf5 %>%
   left_join(us_stta) %>%
-  mutate(SUBEN = SUBEN*Prop)
+  mutate(SUBEN = SUBEN*Prop, 
+         BAJAN = BAJAN*Prop, 
+         A_B = paste(NodoA, NodoB, sep = "_")) %>%
+  select(A_B, SerSen, DISTANCIA, TIEMPO, TARIFA = Tarifa, 
+         FREC, Usu, Prop, SUBEN, BAJAN)
+###New scenario ----
+inf5_users_pred_dt <- n_dt2 %>%
+  left_join(us_stta) %>%
+  mutate(SUBEN = SUBEN_NA, 
+         BAJAN = BAJAN_NB,
+         SUBEN = SUBEN*Prop, 
+         BAJAN = BAJAN*Prop, 
+         A_B = paste(NodoA, NodoB, sep = "_"),
+         FREC = case_when(SerSen == "E01I" ~ 14,
+                            SerSen == "E01R" ~ 11,
+                            T ~ FREC)) %>%
+  select(A_B, SerSen, DISTANCIA, TIEMPO, TARIFA = Tarifa, 
+         FREC, Usu, Prop, SUBEN, BAJAN) %>%
+  bind_rows(inf5_users) %>%
+  mutate(TARIFA = case_when(Usu == "Adulto" ~ 590,
+                            Usu == "Adulto Mayor" ~ 300,
+                            Usu == "Estudiante" ~ 190,
+                            T ~ TARIFA))

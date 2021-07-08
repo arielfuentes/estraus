@@ -11,7 +11,7 @@ cmpl_dt <- read_delim("data/informe5_bus_antofapm_1.csv", delim = ";") %>%
                                             )
                          )
          ) %>%
-  select(-c("Ruta", "Sentido"))
+  select(-c("Ruta", "Sentido", "Tarifa"))
 ##vivaldi output using lee & corre lee executable files ----
 inf5 <- read_delim("data/salida.txt", delim = ";") %>%
   mutate_at(c("TIEMPO", "DISTANCIA", "FLUJO_LIN",
@@ -34,7 +34,6 @@ inf5 <- read_delim("data/salida.txt", delim = ";") %>%
             SUBEN_NB = sum(SUBEN_NB), 
             BAJAN_NA = sum(BAJAN_NA), 
             BAJAN_NB = sum(BAJAN_NA),
-            TARIFA = mean(Tarifa),
             FREC = 60/sum(interv)) %>%
   mutate(SUBEN = SUBEN_NA, BAJAN = BAJAN_NB) %>%
   ungroup()
@@ -48,5 +47,4 @@ inf5_sum <- group_by(inf5, SerSen) %>%
             TASA_USO = sum(TASA_USO),  
             SUBEN = sum(SUBEN),
             BAJAN = sum(BAJAN),
-            TARIFA = mean(TARIFA),
             FREC = mean(FREC))
