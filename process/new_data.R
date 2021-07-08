@@ -1,4 +1,7 @@
 #we will consolidate the data to model ----
+#libraries
+library(ggplot2)
+library(GGally)
 ##selecting data that we will reuse to 
 n_dtI <- inf5 %>%
   filter(SerSen %in% c("119I", "111I")) %>%
@@ -110,3 +113,15 @@ inf5_users_pred_dt <- n_dt2 %>%
                             Usu == "Adulto Mayor" ~ 300,
                             Usu == "Estudiante" ~ 190,
                             T ~ TARIFA))
+#Visualize final data ----
+ggpairs(inf5_users[,3:10])
+ggpairs(inf5_users_pred_dt[,3:10])
+
+ggsave(ggpairs(inf5_users[,3:10]), 
+       filename = "output/EDA_dt.png", 
+       device = "png", 
+       width = 40,
+       height = 30,
+       limitsize = F, 
+       units = "cm"
+       )
