@@ -81,7 +81,9 @@ n_dt2I <- bind_rows(v_1I, v_2I) %>%
 n_dt2R <- bind_rows(v_1R, v_2R) %>%
   mutate(SerSen ="E01R")
 ##Consolidated ----
-n_dt2 <- bind_rows(n_dt2I, n_dt2R)
+n_dt2 <- bind_rows(n_dt2I, n_dt2R) %>%
+  mutate_at(c("NodoA", "NodoB"), as.character) %>%
+  mutate_if(is.numeric, function(x) x = 0)
 rm(v_1I, v_1R, v_2I, v_2R, n_dt2I, n_dt2R, n_dtI, n_dtR)  
 #Data to model ----
 ##open users strata ----
@@ -89,27 +91,22 @@ us_stta <- read_delim("data/Users_strata.csv", delim = ";")
 ##Declassify data by users strata ----
 ###Current data ----
 inf5_users <- inf5 %>%
+  select(-c("FLUJO_LIN", "FLUJO_TOT", 
+            "TASA_USO", "SUBEN", "BAJAN")) %>%
+  mutate_at(c("NodoA", "NodoB"), as.character) %>%
+  bind_rows(n_dt2) %>%
   left_join(us_stta) %>%
-  mutate(SUBEN = SUBEN*Prop, 
-         BAJAN = BAJAN*Prop, 
+  mutate(SUBEN = SUBEN_NA*Prop, 
+         BAJAN = BAJAN_NB*Prop, 
          A_B = paste(NodoA, NodoB, sep = "_")) %>%
   select(A_B, SerSen, DISTANCIA, TIEMPO, TARIFA = Tarifa, 
          FREC, Usu, Prop, SUBEN, BAJAN)
 ###New scenario ----
-inf5_users_pred_dt <- n_dt2 %>%
-  left_join(us_stta) %>%
-  mutate(SUBEN = SUBEN_NA, 
-         BAJAN = BAJAN_NB,
-         SUBEN = SUBEN*Prop, 
-         BAJAN = BAJAN*Prop, 
-         A_B = paste(NodoA, NodoB, sep = "_"),
-         FREC = case_when(SerSen == "E01I" ~ 14,
-                            SerSen == "E01R" ~ 11,
-                            T ~ FREC)) %>%
-  select(A_B, SerSen, DISTANCIA, TIEMPO, TARIFA = Tarifa, 
-         FREC, Usu, Prop, SUBEN, BAJAN) %>%
-  bind_rows(inf5_users) %>%
-  mutate(TARIFA = case_when(Usu == "Adulto" ~ 590,
+inf5_users_pred_dt <- inf5_users %>%
+  mutate(FREC = case_when(SerSen == "E01I" ~ 14,
+                          SerSen == "E01R" ~ 11,
+                          T ~ FREC), 
+         TARIFA = case_when(Usu == "Adulto" ~ 590,
                             Usu == "Adulto Mayor" ~ 300,
                             Usu == "Estudiante" ~ 190,
                             T ~ TARIFA))
