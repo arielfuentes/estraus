@@ -83,7 +83,12 @@ n_dt2R <- bind_rows(v_1R, v_2R) %>%
 ##Consolidated ----
 n_dt2 <- bind_rows(n_dt2I, n_dt2R) %>%
   mutate_at(c("NodoA", "NodoB"), as.character) %>%
-  mutate_if(is.numeric, function(x) x = 0)
+  mutate_at(vars("SUBEN_NA", 
+                 "BAJAN_NA", 
+                 "SUBEN_NB", 
+                 "BAJAN_NB", 
+                 "FREC"), 
+            function(x) x = 0)
 rm(v_1I, v_1R, v_2I, v_2R, n_dt2I, n_dt2R, n_dtI, n_dtR)  
 #Data to model ----
 ##open users strata ----
@@ -111,10 +116,10 @@ inf5_users_pred_dt <- inf5_users %>%
                             Usu == "Estudiante" ~ 190,
                             T ~ TARIFA))
 #Visualize final data ----
-ggpairs(inf5_users[,3:10])
+p_gg <- ggpairs(inf5_users[,3:10])
 ggpairs(inf5_users_pred_dt[,3:10])
 
-ggsave(ggpairs(inf5_users[,3:10]), 
+ggsave(p_gg, 
        filename = "output/EDA_dt.png", 
        device = "png", 
        width = 40,
@@ -122,3 +127,4 @@ ggsave(ggpairs(inf5_users[,3:10]),
        limitsize = F, 
        units = "cm"
        )
+rm(p_gg)
