@@ -111,10 +111,10 @@ inf5_users_pred_dt <- inf5_users %>%
                             Usu == "Estudiante" ~ 190,
                             T ~ TARIFA))
 #Visualize final data ----
-ggpairs(inf5_users[,3:10])
+p_gg <- ggpairs(inf5_users[,3:10])
 ggpairs(inf5_users_pred_dt[,3:10])
 
-ggsave(ggpairs(inf5_users[,3:10]), 
+ggsave(p_gg, 
        filename = "output/EDA_dt.png", 
        device = "png", 
        width = 40,
@@ -122,3 +122,4 @@ ggsave(ggpairs(inf5_users[,3:10]),
        limitsize = F, 
        units = "cm"
        )
+rm(p_gg)
