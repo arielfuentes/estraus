@@ -2,9 +2,8 @@
 library(tidymodels)
 #split data ----
 set.seed(123)
-inf5_users <- na.omit(inf5_users)
-inf5_users_split <- initial_split(inf5_users #%>% select(-A_B)
-                                  , 
+# inf5_users <- na.omit(inf5_users)
+inf5_users_split <- initial_split(inf5_users %>% select(-A_B), 
                                   prop = 3/4, 
                                   strata = Usu)
 inf5_train <- training(inf5_users_split)
@@ -18,7 +17,7 @@ inf5_test %>%
   mutate(prop = n/sum(n))
 #define model ----
 rf_mod <- 
-  rand_forest(trees = 1000) %>% 
+  rand_forest(trees = 3000) %>% 
   set_engine("ranger") %>%
   set_mode("regression")
 #set recipe ----
@@ -39,8 +38,16 @@ rf_test_pred <- predict(rf_fit, inf5_test) %>%
   bind_cols(select(inf5_test, Usu, SUBEN, SerSen))
 rf_new_pred <- predict(rf_fit, na.omit(inf5_users_pred_dt)) %>%
   bind_cols(inf5_users_pred_dt)
+#summary ----
+rf_test_pred %>%
+  group_by(SerSen, Usu) %>%
+  summarise(SUBEN = sum(SUBEN),
+            Pred.SUBEN = sum(.pred))
 
-
+rf_new_pred %>%
+  group_by(SerSen, Usu) %>%
+  summarise(SUBEN = sum(SUBEN),
+            Pred.SUBEN = sum(.pred))
 
 
 

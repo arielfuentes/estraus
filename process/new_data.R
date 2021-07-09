@@ -108,7 +108,7 @@ inf5_users <- inf5 %>%
          FREC, Usu, Prop, SUBEN, BAJAN)
 ###New scenario ----
 inf5_users_pred_dt <- inf5_users %>%
-  mutate(FREC = case_when(SerSen == "E01I" ~ 14,
+  mutate(FREC = case_when(SerSen == "E01I" ~ 15,
                           SerSen == "E01R" ~ 11,
                           T ~ FREC), 
          TARIFA = case_when(Usu == "Adulto" ~ 590,

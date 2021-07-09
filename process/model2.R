@@ -35,7 +35,7 @@ inf5_test %>%
   mutate(prop = n/sum(n))
 #define model ----
 rf_mod <- 
-  rand_forest(trees = 1000) %>% 
+  rand_forest(trees = 3000) %>% 
   set_engine("ranger") %>%
   set_mode("regression")
 #set recipe ----
@@ -53,7 +53,7 @@ rf_fit <- rf_wkf %>%
   fit(inf5_train)
 #prediction ----
 rf_test_pred <- predict(rf_fit, inf5_test) %>%
-  bind_cols(select(inf5_test, Usu, SUBEN, SerSen))
+  bind_cols(select(inf5_test, Usu, SUBEN, SerSen, TARIFA))
+##test performance ----
 rf_new_pred <- predict(rf_fit, inf5_users_sum_new) %>%
   bind_cols(inf5_users_sum_new)
-###################################use data with the same length
