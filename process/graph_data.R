@@ -1,10 +1,10 @@
-#library
+#library ----
 library(tidygraph)
 library(dplyr)
 library(ggplot2)
 library(ggraph)
 
-#tbl for edges
+#tbl for edges ----
 inf5_edg <- inf5 %>%
   group_by(NodoA, NodoB) %>%
   summarise(TIEMPO = mean(TIEMPO),
@@ -12,7 +12,7 @@ inf5_edg <- inf5 %>%
             FLUJO_TOT = mean(FLUJO_TOT)) %>%
   ungroup()
 
-#tibble for nodes 
+#tibble for nodes ----
 inf5_ndA <- inf5 %>%
   group_by(NodoA) %>%
   summarise(SUBEN_NA = sum(SUBEN_NA),
@@ -31,9 +31,9 @@ inf5_nd <- bind_rows(inf5_ndA, inf5_ndB) %>%
   ungroup()
 rm(inf5_ndA, inf5_ndB)
 
-#create graph
+#create graph ----
 inf5_grph <- as_tbl_graph(inf5_edg)
-##add data to nodes
+##add data to nodes ----
 inf5_grph <- inf5_grph %>%
   activate(nodes) %>%
   left_join(inf5_nd)
