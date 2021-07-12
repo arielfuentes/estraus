@@ -89,6 +89,8 @@ n_dt2 <- bind_rows(n_dt2I, n_dt2R) %>%
                  "BAJAN_NB", 
                  "FREC"), 
             function(x) x = 0)
+n_dt2.0 <- n_dt2 %>%
+  mutate(TIEMPO = 60)
 rm(v_1I, v_1R, v_2I, v_2R, n_dt2I, n_dt2R, n_dtI, n_dtR)  
 #Data to model ----
 ##open users strata ----
@@ -99,25 +101,60 @@ inf5_users <- inf5 %>%
   select(-c("FLUJO_LIN", "FLUJO_TOT", 
             "TASA_USO", "SUBEN", "BAJAN")) %>%
   mutate_at(c("NodoA", "NodoB"), as.character) %>%
+  bind_rows(n_dt2.0) %>%
+  left_join(us_stta) %>%
+  mutate(SUBEN = SUBEN_NA*Prop, 
+         BAJAN = BAJAN_NB*Prop, 
+         A_B = paste(NodoA, NodoB, sep = "_"),
+         Tarifa = if_else(SerSen %in% c("E01I", "E01R"), 
+                          3000, 
+                          Tarifa)) %>%
+  select(A_B, SerSen, DISTANCIA, TIEMPO, TARIFA = Tarifa, 
+         FREC, Usu, SUBEN)
+###New scenario ----
+inf5_users_pred_dt <- inf5 %>%
+  select(-c("FLUJO_LIN", "FLUJO_TOT", 
+            "TASA_USO", "SUBEN", "BAJAN")) %>%
+  mutate_at(c("NodoA", "NodoB"), as.character) %>%
   bind_rows(n_dt2) %>%
   left_join(us_stta) %>%
   mutate(SUBEN = SUBEN_NA*Prop, 
          BAJAN = BAJAN_NB*Prop, 
          A_B = paste(NodoA, NodoB, sep = "_")) %>%
   select(A_B, SerSen, DISTANCIA, TIEMPO, TARIFA = Tarifa, 
-         FREC, Usu, Prop, SUBEN, BAJAN)
-###New scenario ----
-inf5_users_pred_dt <- inf5_users %>%
+         FREC, Usu, Prop, SUBEN, BAJAN) %>%
   mutate(FREC = case_when(SerSen == "E01I" ~ 15,
                           SerSen == "E01R" ~ 11,
                           T ~ FREC), 
          TARIFA = case_when(Usu == "Adulto" ~ 590,
                             Usu == "Adulto Mayor" ~ 300,
                             Usu == "Estudiante" ~ 190,
-                            T ~ TARIFA))
+                            T ~ TARIFA),
+         SUBEN = if_else(SerSen %in% c("E01I", "E01R"), 
+                         NA_real_, 
+                         SUBEN)) %>%
+  select(-c("BAJAN", "Prop"))
+##Route data ----
+inf5_users_sum <- inf5_users %>%
+  group_by(SerSen, Usu) %>%
+  summarise(DISTANCIA = sum(DISTANCIA),
+            TIEMPO = sum(TIEMPO),
+            TARIFA = mean(TARIFA),
+            SUBEN = sum(SUBEN),
+            FREC = mean(FREC)) %>%
+  ungroup() 
+inf5_users_sum_new <- inf5_users_pred_dt %>%
+  group_by(SerSen, Usu) %>%
+  summarise(DISTANCIA = sum(DISTANCIA),
+            TIEMPO = sum(TIEMPO),
+            TARIFA = mean(TARIFA),
+            SUBEN = sum(SUBEN),
+            FREC = mean(FREC)) %>%
+  ungroup() 
 #Visualize final data ----
-p_gg <- ggpairs(inf5_users[,3:10])
-ggpairs(inf5_users_pred_dt[,3:10])
+## edge ----
+p_gg <- ggpairs(inf5_users[,3:8])
+ggpairs(inf5_users_pred_dt[,3:8])
 
 ggsave(p_gg, 
        filename = "output/EDA_dt.png", 
@@ -125,6 +162,16 @@ ggsave(p_gg,
        width = 40,
        height = 30,
        limitsize = F, 
-       units = "cm"
-       )
-rm(p_gg)
+       units = "cm")
+##route ----
+q_gg <- ggpairs(inf5_users_sum[,2:7])
+ggpairs(inf5_users_sum_new[,2:7])
+
+ggsave(q_gg, 
+       filename = "output/EDA_dt.png", 
+       device = "png", 
+       width = 40,
+       height = 30,
+       limitsize = F, 
+       units = "cm")
+rm(p_gg, q_gg)
