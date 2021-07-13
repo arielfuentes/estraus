@@ -47,4 +47,4 @@ inf5_sum <- group_by(inf5, SerSen) %>%
             TASA_USO = sum(TASA_USO),  
             SUBEN = sum(SUBEN),
             BAJAN = sum(BAJAN),
-            FREC = mean(FREC))
+            FREC = max(FREC))

@@ -100,3 +100,4 @@ ggplot(rf_new_pred, aes(.pred, SUBEN)) +
   geom_point() + 
   facet_wrap(~Usu) +
   geom_smooth(formula= y~x)
+
