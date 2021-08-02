@@ -1,0 +1,27 @@
+---
+title: "Estimación de Demanda con Modelo de Regresión"
+author: "Estudios"
+date: '`r format(Sys.time(), "%d %B, %Y")`'
+output: 
+  html_document:
+    theme: simplex
+    highlight: tango
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(htmltools)
+library(knitr)
+```
+
+```{r, echo=FALSE}
+htmltools::img(src = knitr::image_uri(file.path("../data/img/logoTransdev.png")
+                                      ),
+               alt = 'logo', 
+               style = 'position:absolute; top:0; right:0; padding:1px;')
+```
+
+## INTRODUCCIÓN
+
+Para modelar recorrido eléctrico de Antofagasta se decidió acomodar a la red de Transporte Público en base a los datos disponibles por modelación Estraus/Vivaldi. Es decir, con base en los resultados de dicho modelación, sus parámetros, información de la red, mas datos de categoría de usuario del informe **UNIDAD DE ESTUDIOS DTPR** se procedió a incluir la futura línea de **Bus Eléctrico (E01)**   
+
