@@ -141,7 +141,7 @@ inf5_users_sum <- inf5_users %>%
             TIEMPO = sum(TIEMPO),
             TARIFA = mean(TARIFA),
             SUBEN = sum(SUBEN),
-            FREC = mean(FREC)) %>%
+            FREC = max(FREC)) %>%
   ungroup() 
 inf5_users_sum_new <- inf5_users_pred_dt %>%
   group_by(SerSen, Usu) %>%
@@ -149,7 +149,7 @@ inf5_users_sum_new <- inf5_users_pred_dt %>%
             TIEMPO = sum(TIEMPO),
             TARIFA = mean(TARIFA),
             SUBEN = sum(SUBEN),
-            FREC = mean(FREC)) %>%
+            FREC = max(FREC)) %>%
   ungroup() 
 #Visualize final data ----
 ## edge ----
@@ -168,7 +168,7 @@ q_gg <- ggpairs(inf5_users_sum[,2:7])
 ggpairs(inf5_users_sum_new[,2:7])
 
 ggsave(q_gg, 
-       filename = "output/EDA_dt.png", 
+       filename = "output/EDA_dtsum.png", 
        device = "png", 
        width = 40,
        height = 30,
