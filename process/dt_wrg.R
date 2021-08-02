@@ -37,7 +37,7 @@ inf5 <- read_delim("data/salida.txt", delim = ";") %>%
             FREC = 60/sum(interv)) %>%
   mutate(SUBEN = SUBEN_NA, BAJAN = BAJAN_NB) %>%
   ungroup()
-rm(cmpl_dt)
+# rm(cmpl_dt)
 
 #summary ----
 inf5_sum <- group_by(inf5, SerSen) %>%

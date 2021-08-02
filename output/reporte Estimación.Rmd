@@ -12,6 +12,8 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 library(htmltools)
 library(knitr)
+library(kableExtra)
+library(DiagrammeR)
 ```
 
 ```{r, echo=FALSE}
@@ -23,5 +25,68 @@ htmltools::img(src = knitr::image_uri(file.path("../data/img/logoTransdev.png")
 
 ## INTRODUCCIÓN
 
-Para modelar recorrido eléctrico de Antofagasta se decidió acomodar a la red de Transporte Público en base a los datos disponibles por modelación Estraus/Vivaldi. Es decir, con base en los resultados de dicho modelación, sus parámetros, información de la red, mas datos de categoría de usuario del informe **UNIDAD DE ESTUDIOS DTPR** se procedió a incluir la futura línea de **Bus Eléctrico (E01)**   
+Para estimar la demanda de recorrido eléctrico de Antofagasta se decidió acomodar a la red de Transporte Público en base a los datos disponibles por modelación Estraus/Vivaldi. Es decir, con base en los resultados de dicha modelación, sus parámetros, información de la red, más datos de categoría de usuario del informe **UNIDAD DE ESTUDIOS DTPR** se procedió a incluir la futura línea de **Bus Eléctrico (E01)**  de modo de generar un modelo de regresión que reaccione en función de sus respectivas variables predictoras, donde finalmente se decidío utilizar un modelo *Random Forest*
 
+## FUENTE DE DATOS
+
+Para la fuente de datos se obtuvo el archivo *salida.txt* al correr *corre_Lee_Informe5.bat* el cual utiliza el ejecutable  *Lee_Informe5.exe*. 
+
+````{r, echo = F}
+kable(cmpl_dt) %>%
+  kable_styling(full_width = F, position = "left") %>%
+  scroll_box(width = "200px", height = "300px")
+```
+
+También se trabajó el archivo *informe4_bus_antofapm_1.lpa* para dar uso a los parámetros *Intervalos (min) y Tarifa* por Ruta.
+
+````{r, echo = F}
+kable(inf5) %>%
+  kable_styling(full_width = F, position = "left") %>%
+  scroll_box(width = "600px", height = "300px")
+
+```
+
+El trabajo de estos archivos está automatizado en *dt_wrg.R*
+
+## PROCESO
+
+Para realizar el proceso de modelación, se trabajó en la siguiente secuencia:
+
+````{r, echo = F}
+grViz("
+digraph {
+
+  #graph att
+  graph [overlap = true]
+
+  # node attributes
+  node [shape = oval,
+        style = filled,
+        fontname = Helvetica,
+        fillcolor = lightblue]
+
+  # edge attributes
+  edge [color = red]
+  
+   # node statements
+  A[label = 'Grafo']
+  B[label = 'EDA']
+  C[label = 'Modelo']
+  D[label = 'Reporte'] 
+  
+  # edge statements
+  A -> B
+  B -> C
+  C -> D
+
+}
+      ")
+
+```
+
+### 1. Generación de Grafo
+
+Un Grafo es la conexión entre nodos mediante arcos, uno de sus usos es en la optimización de redes, en este sentido es que construye la red a modo de grafo con la relación que muestra la modelación Vivaldi antes mencionada.
+
+### 2. Actualización de la red y Análisis Explotario
+### 3. Producción del modelo y reporte
